@@ -9,12 +9,12 @@ class RabbitMqJobMemoryExceededEvent
     /**
      * Create a new event instance.
      *
-     * @param  int  $status
-     * @return void
+     * @param int $status
+     * @param Job|null $job
      */
     public function __construct(
         public int $status = 0,
-        public Job $job
+        public ?Job $job
     ) {
         $this->status = $status;
         $this->job = $job;
@@ -25,7 +25,7 @@ class RabbitMqJobMemoryExceededEvent
         return $this->status;
     }
 
-    public function getJob(): Job
+    public function getJob(): ?Job
     {
         return $this->job;
     }
