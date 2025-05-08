@@ -18,7 +18,7 @@ class RabbitMqJobMemoryExceededEvent
         public int $status = 0,
         public Exception $exception,
         public ?Job $job,
-        public float $memoryUsedInMegabytes,
+        public int $memoryUsedInBytes,
     ) {
         $this->status = $status;
         $this->job = $job;
@@ -39,8 +39,8 @@ class RabbitMqJobMemoryExceededEvent
         return $this->exception;
     }
 
-    public function memoryUsedInMegabytes(): float
+    public function memoryUsedInBytes(): int
     {
-        return $this->memoryUsedInMegabytes;
+        return $this->memoryUsedInBytes;
     }
 }
