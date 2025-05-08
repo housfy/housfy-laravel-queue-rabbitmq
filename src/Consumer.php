@@ -215,7 +215,8 @@ class Consumer extends Worker
             try {
                 throw new Exception('Memory limit exceeded Housfy Message');
             } catch (Exception $e) {
-                $this->events->dispatch(new RabbitMqJobMemoryExceededEvent(static::EXIT_MEMORY_LIMIT, $e, $job));
+                $memoryUsedInBytes = memory_get_usage(true);
+                $this->events->dispatch(new RabbitMqJobMemoryExceededEvent(static::EXIT_MEMORY_LIMIT, $e, $job, $memoryUsedInBytes));
             }
             return static::EXIT_MEMORY_LIMIT;
         } elseif ($this->queueShouldRestart($lastRestart)) {
