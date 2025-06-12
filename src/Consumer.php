@@ -4,8 +4,8 @@ namespace Housfy\LaravelQueueRabbitMQ;
 
 use Exception;
 use Housfy\LaravelQueueRabbitMQ\Events\RabbitMqJobMemoryExceededEvent;
+use Housfy\LaravelQueueRabbitMQ\Events\RabbitMqJobTimeExceededEvent;
 use Illuminate\Container\Container;
-use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -224,7 +224,13 @@ class Consumer extends Worker
         } elseif ($options->stopWhenEmpty && is_null($job)) {
             return static::EXIT_SUCCESS;
         } elseif ($options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime) {
-            return static::EXIT_SUCCESS;
+            try {
+                throw new Exception('Time limit exceeded Housfy Message');
+            } catch (Exception $e) {
+                $elapsedTime = hrtime(true) / 1e9 - $startTime;
+                $this->events->dispatch(new RabbitMqJobTimeExceededEvent(static::EXIT_TIME_LIMIT, $e, $job, $elapsedTime));
+            }
+            return static::EXIT_TIME_LIMIT;
         } elseif ($options->maxJobs && $jobsProcessed >= $options->maxJobs) {
             return static::EXIT_SUCCESS;
         }
